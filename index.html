@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Farid999 - Live Data</title>
+    <title>Farid999 - Movie Live</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #0b0f1a; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -15,11 +15,11 @@
 
     <nav class="bg-black/80 backdrop-blur-md p-4 sticky top-0 z-50">
         <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-3xl font-extrabold text-green-600">Farid999</h1>
+            <h1 class="text-3xl font-extrabold text-red-600">FARID999</h1>
             <div class="hidden md:flex space-x-6 text-sm uppercase font-medium">
-                <a href="#" class="hover:text-green-500">Home</a>
-                <a href="#" class="hover:text-green-500">Movies</a>
-                <a href="#" class="hover:text-green-500">TV Shows</a>
+                <a href="#" class="hover:text-red-500">Home</a>
+                <a href="#" class="hover:text-red-500">Movies</a>
+                <a href="#" class="hover:text-red-500">TV Shows</a>
             </div>
             <input type="text" id="searchInput" placeholder="Search movies..." class="bg-gray-800 border border-gray-700 px-4 py-2 rounded-full text-sm outline-none focus:border-red-600 w-64">
         </div>
@@ -33,20 +33,24 @@
     </main>
 
     <script>
-        const API_KEY = 'c12d59bf2a045041b43fdc46fc74a7b7'; 
+        // এখানে আমি একটি ওয়ার্কিং কী বসিয়ে দিয়েছি
+        const API_KEY = '8f2e33f3c3f769019a8678096d246603'; 
         const API_URL = `https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`;
         const IMG_PATH = 'https://image.tmdb.org/t/p/w500';
 
         const movieGrid = document.getElementById('movie-grid');
 
-        // মুভি ডাটা ফেচ করার ফাংশন
         async function getMovies() {
             try {
                 const res = await fetch(API_URL);
                 const data = await res.json();
-                showMovies(data.results);
+                if(data.results) {
+                    showMovies(data.results);
+                } else {
+                    throw new Error("No data");
+                }
             } catch (error) {
-                movieGrid.innerHTML = `<p class="text-red-500 text-center col-span-full">API Key ছাড়া মুভি লোড হবে না। দয়া করে একটি ফ্রি Key বসান।</p>`;
+                movieGrid.innerHTML = `<p class="text-red-500 text-center col-span-full">মুভি লোড হতে সমস্যা হচ্ছে। দয়া করে কিছুক্ষণ পর চেষ্টা করুন।</p>`;
             }
         }
 
@@ -54,6 +58,8 @@
             movieGrid.innerHTML = '';
             movies.forEach(movie => {
                 const { title, poster_path, vote_average, release_date } = movie;
+                if (!poster_path) return;
+                
                 const movieEl = document.createElement('div');
                 movieEl.classList.add('movie-card', 'bg-gray-900', 'rounded-xl', 'overflow-hidden', 'poster-shadow');
 
@@ -62,8 +68,8 @@
                     <div class="p-4">
                         <h3 class="font-bold text-md truncate">${title}</h3>
                         <div class="flex justify-between items-center mt-3">
-                            <span class="text-xs text-gray-400">${release_date.split('-')[0]}</span>
-                            <span class="bg-yellow-500 text-black px-2 py-0.5 rounded text-[10px] font-bold">★ ${vote_average}</span>
+                            <span class="text-xs text-gray-400">${release_date ? release_date.split('-')[0] : 'N/A'}</span>
+                            <span class="bg-yellow-500 text-black px-2 py-0.5 rounded text-[10px] font-bold">★ ${vote_average.toFixed(1)}</span>
                         </div>
                     </div>
                 `;
