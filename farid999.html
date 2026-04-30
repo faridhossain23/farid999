@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farid999 - Live Data</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0b0f1a; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .movie-card:hover { transform: translateY(-10px); transition: 0.4s; }
+        .poster-shadow { box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+    </style>
+</head>
+<body>
+
+    <nav class="bg-black/80 backdrop-blur-md p-4 sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-3xl font-extrabold text-green-600">Farid999</h1>
+            <div class="hidden md:flex space-x-6 text-sm uppercase font-medium">
+                <a href="#" class="hover:text-green-500">Home</a>
+                <a href="#" class="hover:text-green-500">Movies</a>
+                <a href="#" class="hover:text-green-500">TV Shows</a>
+            </div>
+            <input type="text" id="searchInput" placeholder="Search movies..." class="bg-gray-800 border border-gray-700 px-4 py-2 rounded-full text-sm outline-none focus:border-red-600 w-64">
+        </div>
+    </nav>
+
+    <main class="container mx-auto px-4 py-10">
+        <h2 class="text-2xl font-bold mb-8 border-l-4 border-red-600 pl-4">Trending Now</h2>
+        <div id="movie-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8">
+            <p class="text-gray-500">Loading movies...</p>
+        </div>
+    </main>
+
+    <script>
+        // আপনার TMDB API Key এখানে বসান
+        const API_KEY = 'c12d59bf2a045041b43fdc46fc74a7b7'; 
+        const API_URL = `https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`;
+        const IMG_PATH = 'https://image.tmdb.org/t/p/w500';
+
+        const movieGrid = document.getElementById('movie-grid');
+
+        // মুভি ডাটা ফেচ করার ফাংশন
+        async function getMovies() {
+            try {
+                const res = await fetch(API_URL);
+                const data = await res.json();
+                showMovies(data.results);
+            } catch (error) {
+                movieGrid.innerHTML = `<p class="text-red-500 text-center col-span-full">API Key ছাড়া মুভি লোড হবে না। দয়া করে একটি ফ্রি Key বসান।</p>`;
+            }
+        }
+
+        function showMovies(movies) {
+            movieGrid.innerHTML = '';
+            movies.forEach(movie => {
+                const { title, poster_path, vote_average, release_date } = movie;
+                const movieEl = document.createElement('div');
+                movieEl.classList.add('movie-card', 'bg-gray-900', 'rounded-xl', 'overflow-hidden', 'poster-shadow');
+
+                movieEl.innerHTML = `
+                    <img src="${IMG_PATH + poster_path}" alt="${title}" class="w-full h-[300px] object-cover">
+                    <div class="p-4">
+                        <h3 class="font-bold text-md truncate">${title}</h3>
+                        <div class="flex justify-between items-center mt-3">
+                            <span class="text-xs text-gray-400">${release_date.split('-')[0]}</span>
+                            <span class="bg-yellow-500 text-black px-2 py-0.5 rounded text-[10px] font-bold">★ ${vote_average}</span>
+                        </div>
+                    </div>
+                `;
+                movieGrid.appendChild(movieEl);
+            });
+        }
+
+        getMovies();
+    </script>
+</body>
+</html>
